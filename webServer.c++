@@ -19,76 +19,135 @@ String header = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n";
 String html_1 = R"=====(
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>IOT 2</title>
+        <style>
+            body,
+            html {
+                height: 100%;
+                text-align: center;
+            }
+            body {
+                font: normal 16px/21px Arial, Helvetica, sans-serif;
+                display: flex;
+                justify-content: center;
+                background-color: skyblue;
+            }
+            section {
+                margin-top: 30px;
+                background: aliceblue;
+                border-radius: 10px;
+                padding: 15px;
+                width: 800px;
+                max-width:  100%;
+                height: 300px;
+                box-shadow: 5px 6px 10px rgb(59, 59, 59, 0.5);
+            }
+            header {
+                color: black;
+                text-align: center;
+            }
+            section > div {
+                display: inline-block;
+                width: 300px;
+                height: 50px;
+                background: rgb(135, 151, 238);
+                color: rgb(59, 59, 59);
+                margin: 6px 20px 7.5px;
+                border-radius: 14px;
+                font-size: 18px;
+                font-weight: bold;
+                line-height: 50px;
+            }
+            p {
+                margin-top: 37px;
+            }
+            #loading {
+                position: absolute;
+                left: 50%;
+                top: 10.5%;
+                margin-left: 320px;
+                display: none;
+            }
+            .lds-ripple {
+                display: inline-block;
+                position: relative;
+                width: 80px;
+                height: 80px;
+            }
+            .lds-ripple div {
+                position: absolute;
+                border: 4px solid rgb(135, 151, 238);
+                opacity: 1;
+                border-radius: 50%;
+                animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+            }
+            .lds-ripple div:nth-child(2) {
+                animation-delay: -0.5s;
+            }
+            @keyframes lds-ripple {
+                0% {
+                    top: 36px;
+                    left: 36px;
+                    width: 0;
+                    height: 0;
+                    opacity: 1;
+                }
+                100% {
+                    top: 0px;
+                    left: 0px;
+                    width: 72px;
+                    height: 72px;
+                    opacity: 0;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div id="loading">
+            <div class="lds-ripple">
+                <div></div><div></div>
+            </div>
+        </div>
+        <div id="main">
+            <section>
+                <header>
+                    <h1>Monitoramento do Silo</h1>
+                    <p>Volume: %volume% m³</p>
+                </header>
+                <div>Nível: %porcentagem%%</div>
+                <div>%temp%</div>
+                <footer>
+                    <p>%estado%</p>
+                </footer>
+            </section>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            // essa função, via um "ajax" magico do jQuery recarrega a página apenas "um pedaço"
+            // e substitui em tela por este pedaço mais "atualizado"
+            function reloadSection(onComplete) {
+                var $url = window.location.href + "?r=" + new Date().getTime();
+                $("#main").load($url + " #main > section", onComplete);
+            }
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv='refresh' content='1'>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IOT 2</title>
-    <style>
-        body,
-        html {
-            height: 100%;
-            text-align: center;
-        }
+            // essa função chama a anterior e ao final de uma execução com sucesso, programa
+            // uma próxima execução para daqui a 2 segundos...
+            function timeoutReload() {
+                $("#loading").show();
+                reloadSection(function () {
+                    $("#loading").hide();
+                    setTimeout(timeoutReload, 2000); // 2000 = 2 segundos...
+                });
+            }
 
-        body {
-            display: flex;
-            justify-content: center;
-            background-color: skyblue;
-        }
-
-        section {
-            margin-top: 30px;
-            background: aliceblue;
-            border-radius: 10px;
-            padding: 15px;
-            width: 800px;
-            height: 300px;   
-            box-shadow: 5px 5px 10px rgb(59, 59, 59);
-        }
-
-        header {
-            font: normal 15pt Arial;
-            color: black;
-            text-align: center;
-        }
-
-        div {
-            display: inline-block;
-            width: 300px;
-            height: 50px;
-            background: rgb(135, 151, 238);
-            font: normal 20pt Arial;
-            color: rgb(59, 59, 59);
-            margin-bottom: 7.5px;
-            margin-left: 20px;
-            margin-right: 20px;
-            border-radius: 14px;
-            font: normal 15pt Arial;
-            line-height: 50px;
-        }
-        p{
-          margin-top: 37px;
-          font: normal 15pt Arial;
-        }
-    </style>
-</head>
-
-<body>
-    <section>
-        <header>
-            <h1>Monitoramento do Silo</h1>
-            <p>Volume: %volume%m³</p>
-        </header>
-        <div>Nível: %porcentagem%%</div>
-        <div>%temp%</div>
-        <footer>
-          <p>%estado%</p>
-        </footer>
-    </section>
-</body>
-
+            // aqui chamamos a primeira vez que irá ser executada e agendar as próximas
+            // de 2 em 2 segundos...
+            timeoutReload();
+        </script>
+    </body>
 </html>
 )=====";
 
