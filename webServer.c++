@@ -7,7 +7,7 @@
  * realizar as medições e lógicas de programação com base no critério desejado
  * pelo professor.
  * 
- * @board       ESP8266
+ * @board       ESP8266 D1 R1
  */
 
 String header = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n";
@@ -40,8 +40,7 @@ String html_1 = R"=====(
                 background: aliceblue;
                 border-radius: 10px;
                 padding: 15px;
-                width: 800px;
-                max-width:  100%;
+                width: auto;
                 height: 300px;
                 box-shadow: 5px 6px 10px rgb(59, 59, 59, 0.5);
             }
@@ -68,7 +67,7 @@ String html_1 = R"=====(
                 position: absolute;
                 left: 50%;
                 top: 10.5%;
-                margin-left: 320px;
+                margin-left: 260px;
                 display: none;
             }
             .lds-ripple {
@@ -126,25 +125,17 @@ String html_1 = R"=====(
         </div>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script>
-            // essa função, via um "ajax" magico do jQuery recarrega a página apenas "um pedaço"
-            // e substitui em tela por este pedaço mais "atualizado"
             function reloadSection(onComplete) {
                 var $url = window.location.href + "?r=" + new Date().getTime();
                 $("#main").load($url + " #main > section", onComplete);
             }
-
-            // essa função chama a anterior e ao final de uma execução com sucesso, programa
-            // uma próxima execução para daqui a 2 segundos...
             function timeoutReload() {
                 $("#loading").show();
                 reloadSection(function () {
                     $("#loading").hide();
-                    setTimeout(timeoutReload, 2000); // 2000 = 2 segundos...
+                    setTimeout(timeoutReload, 500); //Tempo de Atualização (500 ms)
                 });
             }
-
-            // aqui chamamos a primeira vez que irá ser executada e agendar as próximas
-            // de 2 em 2 segundos...
             timeoutReload();
         </script>
     </body>
@@ -154,15 +145,16 @@ String html_1 = R"=====(
 /* Inclusão de Bibliotecas */
 #include <ESP8266WiFi.h>
 
-char ssid[] = "redeID";
-char pass[] = "password";
+/* Substitua o ID e PASSWORD pelo nome da sua rede e senha */
+char ssid[] = "ID";
+char pass[] = "PASSWORD";
 
 WiFiServer server(80);
 
 /* Definições e Constantes */
-#define TRIGGER D6
-#define ECHO D7
-int LEDs[3] = {D8, D9, D10};
+#define ECHO D2
+#define TRIGGER D3
+int LEDs[3] = {D6, D7, D8};
 long actived;
 float distance,
     volume,
@@ -172,6 +164,7 @@ String tmpString = "";
 String estado = "Capacidade: Normal";
 String temp = "Lâmpada: Ligada";
 unsigned long millisBASE = millis();
+unsigned long millisULTRA = millis();
 
 /**
  * @brief   Função utilizada para medir a distância do sensor Ultrassônico (HC-SR04) 
@@ -189,12 +182,19 @@ void ReadUltrasonic()
     digitalWrite(TRIGGER, LOW);
     actived = pulseIn(ECHO, HIGH);
     distance = actived * 0.034 / 2; //Conversão para centímetros (cm)
-    volume = (9.4247779608 - ((distance / 100) * 3.1415926536 * 3)); //Conversão para volume (m³)
-    porcentagem = (100 * volume) / 9.4247779608;
+    if ((millis() - millisULTRA) < 15)
+    {
+        volume = (9.4247779608 - ((distance / 100) * 3.1415926536 * 3)); //Conversão para volume (m³)
+        porcentagem = (100 * volume) / 9.4247779608;
+    }
+    if ((millis() - millisULTRA) > 2000)
+    {
+        millisULTRA = millis();
+    }
     Serial.print("Volume: ");
     Serial.print(volume);
     Serial.println(" m³");
-    Serial.print("Porcentagem: ");
+    Serial.print("Abastecimento: ");
     Serial.print(porcentagem);
     Serial.println(" %");
 }
@@ -203,7 +203,7 @@ void ReadUltrasonic()
  * @brief   Função utilizada para medir a luminosidade do sensor LDR.  
  * 
  * 
- * @return      luminosidade do silo
+ * @return      Print("Luminosidade do Silo")
  */
 
 void ReadLDR()
@@ -211,15 +211,15 @@ void ReadLDR()
     LDR = analogRead(A0);
     Serial.print("LDR: ");
     Serial.print(LDR);
-    Serial.println(" Lumen");
+    Serial.println(" Lúmens");
 }
 
 /**
  * @brief   Função utilizada para realizar a lógica de atuação com base no volume do Silo
  * 
  * 
- * @return      volume maior que 5m³ = Print("Capacidade Normal")
- *              volume menor que 5m³ = Print("Capacidade Crítica")
+ * @return      Volume maior que 5m³ = Print("Capacidade Normal")
+ *              Volume menor que 5m³ = Print("Capacidade Crítica")
  *                                     LED BUILTIN piscando
  */
 
@@ -230,11 +230,11 @@ void nivelCheck()
         estado = "Capacidade: Crítica";
         if ((millis() - millisBASE) < 100)
         {
-            digitalWrite(LED_BUILTIN, HIGH);
+            digitalWrite(LED_BUILTIN, LOW);
         }
         else
         {
-            digitalWrite(LED_BUILTIN, LOW);
+            digitalWrite(LED_BUILTIN, HIGH);
         }
         if ((millis() - millisBASE) > 200)
         {
@@ -244,7 +244,7 @@ void nivelCheck()
     else
     {
         estado = "Capacidade: Normal";
-        digitalWrite(LED_BUILTIN, LOW);
+        digitalWrite(LED_BUILTIN, HIGH);
     }
 }
 
@@ -260,7 +260,7 @@ void nivelCheck()
 
 void lumenCheck()
 {
-    if (LDR > 950)
+    if (LDR > 750)
     {
         temp = "Lâmpada: Desligada";
         digitalWrite(LEDs[2], HIGH);
@@ -282,6 +282,7 @@ void setup()
     }
     pinMode(TRIGGER, OUTPUT);
     pinMode(ECHO, INPUT);
+    pinMode(LED_BUILTIN, OUTPUT);
 
     Serial.begin(115200);
 
