@@ -11,22 +11,22 @@
 * Sensor Ultrassônico (HC-SR04)
 * Sensor de Luminosidade (LDR)
 * Protoboard
-* ESP8266
+* ESP8266 D1 R1
 * LED Vermelho, Verde e Azul (ou LED RGB)
 * 3 resistores de 330R
 * Cabos para conexão
 
 #
 
-## # Ligações no ESP8266 (respectivamente)
+## # Ligações no ESP8266 D1 R1 (respectivamente)
 
-* LEDs (ou LED RGB) conectados em `D8, D9 e D10` (Azul, Verde e Vermelho)
-* Sensor Ultrassônico conectado em `D6, D7, 5V e GND` (TRIGGER, ECHO, VCC e GND)
+* LEDs (ou LED RGB) conectados em `D6, D7 e D8` (Azul, Verde e Vermelho)
+* Sensor Ultrassônico conectado em `D2, D3, 5V e GND` (ECHO, TRIGGER, VCC e GND)
 * Sensor LDR conectado em `A0, 3.3V e GND` (A0, VCC e GND)
 
 #
 
-## # E como que usa?
+## # Preparação do Ambiente
 <p>
 
 ### Para executar esse código, foi utilizado a [IDE do Arduino](https://www.arduino.cc/en/software) com algumas personalizações, nas quais são:
@@ -45,13 +45,19 @@ http://arduino.esp8266.com/stable/package_esp8266com_index.json
 * Inclusão da biblioteca ESP8266 em Ferramentas>Gerenciar Bibliotecas
 
 <p align="center">
-  <img src="./images/esp8266.png" alt="preferencias"/><br>
+  <img src="./images/esp8266.png" alt="incluindo-esp8266"/><br>
 </p>
 
 * Download da biblioteca [<ESP8266WiFi.h>](http://www.martyncurrey.com/download/esp8266wifi-library/) e a inclusão da mesma em Sketch>Incluir Biblioteca>Adicionar Biblioteca .ZIP
 
 <p align="center">
-  <img src="./images/wifi.png" alt="preferencias"/><br>
+  <img src="./images/wifi.png" alt="selecionando-esp8266wifi"/><br>
+</p>
+
+* Seleção da placa LOLIN(WeMos) D1 R1 e a porta USB onde a placa está conectada.
+
+<p align="center">
+  <img src="./images/placa-porta.png" alt="placa-porta"/><br>
 </p>
 
 #
@@ -64,10 +70,10 @@ http://arduino.esp8266.com/stable/package_esp8266com_index.json
 #
 
 <p style="font: normal 12pt Arial" align="center">
-Com seu IP, basta jogar no navegador de seu celular o computador, e sucesso!
+Com seu IP, basta inserir no navegador de seu celular ou computador
 <p>
 
-<p style="font: normal 12pt monospace" align="center">
+<p style="font: normal 12pt Arial" align="center">
 Enjoy!
 <p>
 
