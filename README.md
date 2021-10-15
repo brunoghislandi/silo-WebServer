@@ -65,16 +65,12 @@ http://arduino.esp8266.com/stable/package_esp8266com_index.json
 ## # Finalizando
 <p>
 
-### Após todos sses passos, basta rodar o código na IDE, quando ele terminar de compilar, abra o Console e desative a Auto-rolagem, logo irá aparecer o IP de sua máquina embaixo de [CONNECTED] (caso você já ter ajustado no código o campo `char ssid[]` e `char pass[]` com os dados de sua rede, caso contrário irá ficar conectando infinitamente).
+### Após todos esses passos basta rodar o código na IDE, quando ele terminar de compilar abra o Console e desative a Auto-rolagem, em alguns segundos irá aparecer o IP alocado para uso embaixo de [CONNECTED] (caso você já ter ajustado no código o campo `char ssid[]` e `char pass[]` com os dados de sua rede, do contrário irá ficar conectando infinitamente).
 
 #
 
 <p style="font: normal 12pt Arial" align="center">
-Com seu IP, basta inserir no navegador de seu celular ou computador
-<p>
-
-<p style="font: normal 12pt Arial" align="center">
-Enjoy!
+Com o IP salvo, basta inseri-lo no navegador de seu celular ou computador
 <p>
 
 #
